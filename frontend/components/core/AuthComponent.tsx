@@ -8,8 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Button } from "../ui/button";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { userSigninSchema, userSignupSchema } from "@/lib/validations/user-validation";
-import { ZodError } from "zod";
+import { handleError } from "@/lib/handleError";
+import { SignInUser, SignUpUser } from "@/app/api/userApi";
+import { useRouter } from "next/navigation";
 function AuthComponent() {
+    const router = useRouter();
     const [email, setEmail] = useState <string>("");
     const [password, setPassword] = useState <string>("");
     const [confirmPassword, setConfirmPassword] = useState <string>("");
@@ -17,47 +20,33 @@ function AuthComponent() {
     const[error, setError] = useState <string>("");
 
 
-    // const handleinputchange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const {name, value} = e.target;
-    //     if(name === "email") {
-    //         setEmail(value);
-    //     } else if (name === "password") {
-    //         setPassword(value);
-    //     }
-    //     else if (name === "confirm-signup-password") {
-    //         setConfirmPassword(value);
-    //     }
-    //     else if (name === "signup-name") {
-    //         setName(value);
-    //     }
-    // }
-    const handleSignIn=()=>{
+    const handleSignIn= async ()=>{
+        
         try {
-            userSigninSchema.parse({email, password});
-            console.log("Sign in successful");
-            
+           const userData = userSigninSchema.parse({email, password});
+           const response = await SignInUser(userData as unknown as typeof userSigninSchema)
+           if (response.status === 200){
+            console.log("response", response)
+           router.push("/dashboard");
+           setError("");
+           }
         } catch (error) {
-            if(error instanceof ZodError){
-                setError(error.issues[0].message as string);
-            }
-            else{
-                setError(error as string);
-            }
+            setError(handleError(error));
         }
     }
 
-    const handleSignUp=()=>{
+    const handleSignUp= async()=>{
         try {
-            userSignupSchema.parse({name, email, password, confirmPassword});
-            console.log("Sign up successful");
+           const userData = userSignupSchema.parse({name, email, password, confirmPassword});
+           const response = await SignUpUser(userData as unknown as typeof userSignupSchema);
+           if (response.status === 201){
+            console.log("response", response)
+           router.push("/dashboard");
+           setError("");
+           }
             
         } catch (error) {
-            if(error instanceof ZodError){
-                setError(error.issues[0].message as string);
-            }
-            else{
-                setError(error as string);
-            }
+          setError(handleError(error));
         }
     }
   return <div className="w-[400px]">
@@ -154,7 +143,7 @@ function AuthComponent() {
         {/* TODO: implemnet forgot passowrd in future */}
         <CardFooter> 
             {error && <Alert variant="destructive">
-                <AlertTitle>Validation Error</AlertTitle>
+                <AlertTitle>Error   </AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
             </Alert>}
         </CardFooter>

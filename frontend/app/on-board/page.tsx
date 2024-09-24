@@ -10,12 +10,11 @@ function Page() {
       <Image src="/Board.svg" alt="Board" width={20} height={20} />
       </div> */}
         <div className="text-center">
-      
           <h1 className="text-4xl font-bold text-white mb-4">Welcome to Pro Manage</h1>
           <p className="text-xl text-gray-300">Streamline your work with our powerful task management tool.</p>
         </div>
       </div>
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 ">
       {/* Auth Comopnent */}
         <AuthComponent />
       </div>

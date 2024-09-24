@@ -5,13 +5,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsc -b && node dist/index.js",
-    "prod": "tsc -b && node dist/index.js"
+    "build": "tsc -b",
+    "db:generate": "cd src/prisma && npx prisma generate",
+    "db:studio": "cd src/prisma && npx prisma studio",
+    "prod": "npm run db:generate && npm run build && node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/client": "^5.19.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
     "bcryptjs": "^2.4.3",
@@ -19,5 +23,8 @@
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
     "typescript": "^5.6.2"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.7"
   }
 }

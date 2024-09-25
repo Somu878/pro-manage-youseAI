@@ -36,9 +36,9 @@ const [isDialogOpen, setIsDialogOpen] = useState(false)
               <TabsTrigger value="list">List</TabsTrigger>
             </TabsList>
             <TabsContent value="board">
-              <DragDropContext onDragEnd={handleDragEnd}>
+            
               <BoardView board={board} />
-              </DragDropContext>
+             
             </TabsContent>
             <TabsContent value="list">
               <ListView board={board} />

@@ -6,7 +6,8 @@ import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TaskDialog } from "@/components/core/task-dialog"
 import { useState } from "react"
-import { Draggable } from "react-beautiful-dnd"
+import { formatDate } from "@/lib/helpers"
+
 export const getPriorityColor = (priority: string) => {
   switch (priority.toLowerCase()) {
     case 'high':
@@ -22,9 +23,8 @@ export const getPriorityColor = (priority: string) => {
 export default function Task({task}: {task: TaskType}) {
 const [isDialogOpen, setIsDialogOpen] = useState(false)
     return (
-      <Draggable draggableId={task.id as string} index={task.id as any}>
-        {(provided,snapshot)=>(
-        <Card className={`${snapshot.isDragging ? "drag" : ""}`} ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
+    
+        <Card>
             <CardHeader>
               <div className="flex justify-between items-center w-full">
                 <CardTitle className="text-xl">{task.title}</CardTitle>
@@ -46,16 +46,15 @@ const [isDialogOpen, setIsDialogOpen] = useState(false)
                 <CardDescription className="text-ellipsis overflow-hidden whitespace-nowrap">{task.description}</CardDescription>
             </CardHeader>
             <CardFooter className="p-3 pt-0">
-                              <div className="flex justify-between items-center w-full">
+                              <div className="flex justify-between items-center w-full px-2">
                                 <Badge className={`${getPriorityColor(task.priority)} text-white capitalize`}>
                                   {task.priority}
                                 </Badge>
-                           {task.dueDate && <span className="text-xs text-gray-500"> {task.dueDate}</span>}
+                           {task.dueDate && <span className="text-xs text-gray-500"> {formatDate(task.dueDate)}</span>}
                               </div>
                             </CardFooter>
                             <TaskDialog task={task} isOpen={isDialogOpen} onClose={()=>setIsDialogOpen(false)} onSave={()=>setIsDialogOpen(false)} />
         </Card>
-        )}
-        </Draggable>
+     
     )
 }

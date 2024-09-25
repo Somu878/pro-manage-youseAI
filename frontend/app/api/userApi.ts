@@ -17,13 +17,12 @@ export async function SignUpUser(user: typeof userSignupSchema){
 export async function GetUser(token: string){
    
   try {
-   
     const response = await axiosInstance.get(`/user/profile`, {
         headers: {
             authorization: token
         }
     });
-    return response.data;
+    return response.data
   } catch (error) {
     return null;
   }

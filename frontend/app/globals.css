@@ -76,3 +76,17 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* .loader div {
+  @apply absolute w-[8%] h-[24%] bg-gray-500 left-1/2 top-[30%] opacity-0 rounded-full shadow-sm;
+  animation: fade458 1s linear infinite;
+} */
+/* 
+@keyframes spin89345 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} */

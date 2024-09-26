@@ -23,7 +23,7 @@ interface TaskDialogProps {
   task?: Task | null
 }
 
-export function TaskDialog({ isOpen, onClose, onSave, task }: TaskDialogProps) {
+export function TaskDialog({ isOpen, onClose,  task }: TaskDialogProps) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [status, setStatus] = useState<Task['status']>()

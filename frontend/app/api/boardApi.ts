@@ -2,22 +2,41 @@ import axiosInstance from "./axiosClient";
 import { Task as TaskType } from '@/lib/types';
 
 export const getBoard = async () => {
-    const response = await axiosInstance.get("/task",{
-        // headers: {
-        //     authorization: token
-        // }
-    });
-    return response.data;
+    const response = await axiosInstance.get("/tasks/board");
+    if(response.status === 200){
+        return response.data
+    }
+   else{
+    throw new Error('Failed to get board');
+   }
 }
 
-export const updateBoard = async (newBoard: TaskType[]): Promise<void> => {
-    // Implement your API call to update the board
-    // For example:
-    // await fetch('/api/board', {
-    //   method: 'PUT',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(newBoard),
-    // });
+export const updateBoardTasks = async (newBoard: TaskType[]): Promise<void> => {
+    const response = await axiosInstance.patch("/tasks/board",{tasks:newBoard});
+    if(response.status === 200){
+        return response.data
+    }
+    else{
+        throw new Error('Failed to update board');
+    }
+};
+
+export const addTask = async (task: TaskType): Promise<void> => {
+    const response = await axiosInstance.post("/tasks",task);
+    if(response.status === 200){
+        return response.data
+    }
+    else{
+        throw new Error('Failed to add task');
+    }
+};
+
+export const updateTask = async (task: TaskType): Promise<void> => {
+    const response = await axiosInstance.patch(`/tasks/${task.id}`,task);
+    if(response.status === 200){
+        return response.data
+    }
+    else{
+        throw new Error('Failed to update task');
+    }
 };

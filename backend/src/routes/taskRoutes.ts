@@ -12,9 +12,14 @@ router.use(verifyToken);
 router.post("/",taskController.createTask);
 
 //@desc Get all tasks
-//@route GET /api/tasks
+//@route GET /api/v1/tasks
 //@access Private
-router.get("/",  taskController.getTasks);
+router.get("/board",  taskController.getTasks);
+
+//@desc Update Tasks
+//@route POST /api/v1/tasks/board
+//@acess Private
+router.patch("/board", taskController.updateTasksStatus);
 
 //@desc Get task by id
 //@route GET /api/tasks/:id

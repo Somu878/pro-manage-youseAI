@@ -23,7 +23,6 @@ export const getPriorityColor = (priority: string) => {
 export default function Task({task}: {task: TaskType}) {
 const [isDialogOpen, setIsDialogOpen] = useState(false)
     return (
-    
         <Card>
             <CardHeader>
               <div className="flex justify-between items-center w-full">

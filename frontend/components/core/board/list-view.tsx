@@ -5,34 +5,18 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Task } from "@/lib/types";
-import { ArrowUpDown, Columns, MoreHorizontal, Trash2 } from "lucide-react";
+import { ArrowUpDown, Columns, Loader, MoreHorizontal, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getPriorityColor } from "./Task";
-import { format } from "date-fns";
 import { TaskDialog } from "../task-dialog";
+import { useBoard } from "@/app/hooks/UseBoard";
 
-
-const statusColors={
-  todo:{
-    text:"To Do",
-    color:"bg-blue-500"
-  },
-  in_progress:{
-    text:"In Progress",
-    color:"bg-yellow-500"
-  },
-  done:{
-    text:"Done",
-    color:"bg-green-500"
-  }
-}
-function ListView({board}:{board:Task[]}) {
+function ListView() {
+  const {updateBoard,board,isLoading,error}=useBoard()
   const [tasks,setTasks]=useState(board)
   const [isOpen,setIsOpen]=useState(false)
   const [task,setTask]=useState<Task | null>(null)
-  const filterTasks=(status:string)=>{
-    setTasks(board.filter((task)=>task.status===status))
-  }
+
   const [status,setStatus]=useState("all")
   const [priority,setPriority]=useState("all")
   useEffect(() => { 
@@ -46,6 +30,8 @@ function ListView({board}:{board:Task[]}) {
     }
     setTasks(filteredTasks);
   }, [status, priority, board]);
+  if (isLoading) return 
+  if (error) return <div>Error: {error}</div>;
   return <div>
     <div className="flex justify-end space-x-4 mb-4 ">
 
@@ -103,8 +89,8 @@ function ListView({board}:{board:Task[]}) {
                 <TableCell >{task.dueDate ? task.dueDate : "-"}</TableCell>
                 <TableCell>
                 <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                  <Button variant="outline" size="icon">
+                                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
                   <MoreHorizontal className="h-4 w-4" />
                   </Button>
                                   </DropdownMenuTrigger>

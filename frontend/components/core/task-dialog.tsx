@@ -13,6 +13,7 @@ import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Task, TaskStatus } from "@/lib/types"
+import { addTask, updateTask } from "@/app/api/boardApi"
 
 
 interface TaskDialogProps {
@@ -28,39 +29,50 @@ export function TaskDialog({ isOpen, onClose, onSave, task }: TaskDialogProps) {
   const [status, setStatus] = useState<Task['status']>()
   const [priority, setPriority] = useState<Task['priority']>("medium")
   const [dueDate, setDueDate] = useState<Date | null>(null)
-  const columnTitles = {
-    'todo': 'To Do',
-    'in_progress': 'In Progress',
-    'done': 'Done',
-  }
+const [action,setAction]=useState<"add" | "edit">("add")
   useEffect(() => {
     if (task) {
       setTitle(task.title)
       setDescription(task.description)
       setStatus(task.status)
       setPriority(task.priority)
-      setDueDate(new Date(task.dueDate))
+      setDueDate(new Date(task.dueDate as string))
+      setAction("edit")
     } else {
-      // Reset form for new task
       setTitle("")
       setDescription("")
       setStatus("todo" as TaskStatus)
       setPriority("")
       setDueDate(null)
+      setAction("add")
     }
   }, [task])
 
-  const handleSave = () => {
-    // const updatedTask: Task = {
-    //   id: task?.id,
-    //   title,
-    //   description,
-    //   status,
-    //   priority,
-    //   dueDate,
-    // }
-    // onSave(updatedTask)
-    // onClose()
+  const handleSave = async () => {
+if (action==="add"){
+  const newTask: Task = {
+    id: Date.now().toString(),
+    title,
+    description,
+    status:status as TaskStatus,
+    priority,
+    dueDate:dueDate?.toISOString() as string | null,
+  }
+  await addTask(newTask)
+  onClose()
+}
+else{
+  const updatedTask = {
+    ...task,
+    title,
+    description,
+    status:status as TaskStatus,
+    priority,
+    dueDate: dueDate ? dueDate.toISOString() : null,
+  }
+  await updateTask(updatedTask as Task)
+  onClose()
+}
   }
 
   return (

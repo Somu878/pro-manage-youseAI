@@ -12,13 +12,13 @@ app.use(express.json());
 //cors
 app.use(cors({
   origin: process.env.FRONTEND_URL,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],  
 }));
 //user routes
 app.use("/api/v1/user", userRouter);
 //task routes
-app.use("/api/v1/task", taskRouter);
+app.use("/api/v1/tasks", taskRouter);
 
 //health check
 app.get("/health", (req, res) => {

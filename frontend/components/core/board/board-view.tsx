@@ -1,17 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Task from "./Task";
-import {  Task as TaskType } from "@/lib/types";
+import {  TaskStatus, Task as TaskType } from "@/lib/types";
 import { Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { DndContext } from "@/components/context/DndContext";
 
+import { useBoard } from "@/app/hooks/UseBoard";
+import { Loader } from "lucide-react";
 
-function BoardView({ board }: { board: TaskType[] }) {
-  const [tasks, setTasks] = useState({
-    todo: board.filter((task) => task.status === 'todo'),
-    in_progress: board.filter((task) => task.status === 'in_progress'),
-    done: board.filter((task) => task.status === 'done'),
+
+function BoardView() {
+  const{board,updateBoard,isLoading,error}=useBoard()
+  const [tasks, setTasks] = useState<Record<TaskStatus, TaskType[]>>({
+    todo: [],
+    in_progress: [],
+    done: [],
   });
 
+  useEffect(() => {
+    setTasks({
+      todo: board.filter((task) => task.status === 'todo'),
+      in_progress: board.filter((task) => task.status === 'in_progress'),
+      done: board.filter((task) => task.status === 'done'),
+    });
+  }, [board]);
   const columnsOrder = ['todo', 'in_progress', 'done'];
   const columnTitles = {
     todo: 'To Do',
@@ -19,26 +30,60 @@ function BoardView({ board }: { board: TaskType[] }) {
     done: 'Done',
   };
 
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
     const { source, destination} = result;
-console.log(source,destination)
-    // If the item is dropped outside any droppable area
-    if (!destination) return;
+   if (!destination) return;
+    if (source.droppableId === destination.droppableId) {
+      const column = source.droppableId as keyof typeof tasks;
+      const reorderedTasks = Array.from(tasks[column]);
+      const [removedTask] = reorderedTasks.splice(source.index, 1);
+      reorderedTasks.splice(destination.index, 0, removedTask);
+      setTasks((prev) => ({
+        ...prev,
+        [column]: reorderedTasks,
+      }));
+      console.log(tasks)
+    } else {
+      // Moving task between columns
+      const sourceColumn = source.droppableId as keyof typeof tasks;
+      const destinationColumn = destination.droppableId as keyof typeof tasks;
 
-    const sourceColumn = source.droppableId;
-    const sourceIndex = source.index;
-    const destColumn = destination.droppableId;
-    const destIndex = destination.index;
-    console.log(sourceColumn,sourceIndex)
-    console.log(destColumn,destIndex)
+      const sourceTasks = Array.from(tasks[sourceColumn]);
+      const destTasks = Array.from(tasks[destinationColumn]);
+
+      // Remove the task from the source column
+      const [movedTask]= sourceTasks.splice(source.index, 1) as TaskType[]
+      console.log(movedTask)
+
+      // Add the task to the destination column
+      destTasks.splice(destination.index, 0, movedTask);
+      console.log(destTasks)
+      //update the task's status when moving between columns
+      movedTask.status = destinationColumn as TaskStatus;
+
+      // Update the state with tasks in both columns
+      setTasks((prev) => ({
+        ...prev,
+        [sourceColumn]: sourceTasks,
+        [destinationColumn]: destTasks,
+      }));
+      const all = [
+        ...tasks.todo,  
+        ...tasks.in_progress,
+        ...tasks.done
+      ]
+    updateBoard(all)
+    }
   };
 
+if (isLoading) return <Loader />;
+if (error) return <div>Error: {error}</div>;
   return (
     <DndContext onDragEnd={onDragEnd}>
       <div className="p-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {columnsOrder.map((column,index) => (
-            <Droppable key={index} droppableId={column} >
+            <Droppable key={index} droppableId={column} isCombineEnabled={true} >
               {(provided) => (
                 <div
                 {...provided.droppableProps}

@@ -6,23 +6,16 @@ import { User } from "@/components/core/Navbar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ListView from "@/components/core/board/list-view";
-import { useFetchBoard } from "../hooks/UseFetchBoard";
 import { useState } from "react";
 import { TaskDialog } from "@/components/core/task-dialog";
-import { DragDropContext } from "react-beautiful-dnd";
+import { BoardProvider } from "@/components/context/BoardContext";
 export default function Page() {
   const { user } = useAuth();
-  const { board, error, loading, updateBoardState } = useFetchBoard();
+
 const [isDialogOpen, setIsDialogOpen] = useState(false)
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  function handleDragEnd(): void {
-    throw new Error("Function not implemented.");
-  }
-
   return (
     <div>
+      <BoardProvider>
       <Navbar userName={user as unknown as User} />
       <div className="flex-grow mx-auto container p-4 ">
         <div className="flex justify-between items-center mb-6">
@@ -36,12 +29,13 @@ const [isDialogOpen, setIsDialogOpen] = useState(false)
               <TabsTrigger value="list">List</TabsTrigger>
             </TabsList>
             <TabsContent value="board">
-            
-              <BoardView board={board} />
+            {/* Board view */}
+              <BoardView />
              
             </TabsContent>
             <TabsContent value="list">
-              <ListView board={board} />
+              {/* <List view /> */}
+              <ListView />
             </TabsContent>
           </Tabs>
         </div>
@@ -49,6 +43,7 @@ const [isDialogOpen, setIsDialogOpen] = useState(false)
         </div>
       </div>
       <TaskDialog isOpen={isDialogOpen} onClose={()=>setIsDialogOpen(false)} onSave={()=>setIsDialogOpen(false)} />
+      </BoardProvider>
     </div>
   );
 }

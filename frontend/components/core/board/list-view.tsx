@@ -1,18 +1,18 @@
-import { useFetchBoard } from "@/app/hooks/UseFetchBoard";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Task } from "@/lib/types";
-import { ArrowUpDown, Columns, Loader, MoreHorizontal, Trash2 } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal} from "lucide-react";
 import { useEffect, useState } from "react";
 import { getPriorityColor } from "./Task";
 import { TaskDialog } from "../task-dialog";
 import { useBoard } from "@/app/hooks/UseBoard";
 
 function ListView() {
-  const {updateBoard,board,isLoading,error}=useBoard()
+  const {board,isLoading,error}=useBoard()
   const [tasks,setTasks]=useState(board)
   const [isOpen,setIsOpen]=useState(false)
   const [task,setTask]=useState<Task | null>(null)

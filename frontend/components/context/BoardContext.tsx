@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import _ from 'lodash';
 import { Task as TaskType } from '@/lib/types';
 import { getBoard, updateBoardTasks } from '@/app/api/boardApi';

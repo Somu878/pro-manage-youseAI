@@ -24,6 +24,7 @@ export async function GetUser(token: string){
     });
     return response.data
   } catch (error) {
+    console.log(error);
     return null;
   }
 }

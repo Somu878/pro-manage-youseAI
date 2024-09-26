@@ -84,7 +84,6 @@ if (action==="add"){
   resetForm()
 }
 else{
-  // updated task
   const updatedTask = {
     ...task,
     title,

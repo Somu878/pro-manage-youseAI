@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils"
 import { Task, TaskStatus } from "@/lib/types"
 import { addTask, updateTask } from "@/app/api/boardApi"
 import { useBoard } from "@/app/hooks/UseBoard"
+import { taskSchema } from "@/lib/validations/task-validation"
 
 
 interface TaskDialogProps {
@@ -59,6 +60,14 @@ resetForm()
   }, [task])
 
   const handleSave = async () => {
+    try{
+    await taskSchema.parseAsync({
+      title,
+      description,
+      status,
+      priority,
+      dueDate: dueDate?.toISOString() as string | null,
+    });
 if (action==="add"){
   const newTask: Task = {
     id: Date.now().toString(),
@@ -88,6 +97,11 @@ else{
   onSave(updatedTask as Task)
   resetForm()
   refreshBoard()
+}
+  }
+catch(error){
+  console.log(error)
+  return
 }
   }
 

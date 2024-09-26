@@ -5,31 +5,56 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Task } from "@/lib/types";
-import { ArrowUpDown, MoreHorizontal} from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, RefreshCcw} from "lucide-react";
 import { useEffect, useState } from "react";
 import { getPriorityColor } from "./Task";
 import { TaskDialog } from "../task-dialog";
 import { useBoard } from "@/app/hooks/UseBoard";
+import { formatDate } from "@/lib/helpers";
+import { deleteTask } from "@/app/api/boardApi";
+import { TaskStatus } from "@/lib/types";
 
 function ListView() {
-  const {board,isLoading,error}=useBoard()
+  const {board,isLoading,error,refreshBoard}=useBoard()
   const [tasks,setTasks]=useState(board)
   const [isOpen,setIsOpen]=useState(false)
   const [task,setTask]=useState<Task | null>(null)
-
   const [status,setStatus]=useState("all")
   const [priority,setPriority]=useState("all")
+  const [sortOption,setSortOption]=useState("priority_high_to_low")
   useEffect(() => { 
     let filteredTasks = board;
-    
     if (status !== "all") {
       filteredTasks = filteredTasks.filter((task) => task.status === status);
     }
     if (priority !== "all") {
       filteredTasks = filteredTasks.filter((task) => task.priority === priority);
     }
+    // Sorting logic
+  if (sortOption === "priority_high_to_low") {
+      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      filteredTasks = filteredTasks.sort((a:Task, b:Task) => priorityOrder[a.priority as keyof typeof priorityOrder] - priorityOrder[b.priority as keyof typeof priorityOrder]);
+    }
+    else if(sortOption==='priority_low_to_high') {
+      const priorityOrder = { high: 1, medium: 2, low: 3 };
+      filteredTasks = filteredTasks.sort((a:Task, b:Task) => priorityOrder[a.priority as keyof typeof priorityOrder] - priorityOrder[b.priority as keyof typeof priorityOrder]);
+    }
+    else if (sortOption==='dueDate'){
+      filteredTasks = filteredTasks.sort((a: Task, b: Task) => {
+        if (a.dueDate && b.dueDate) {
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        } else if (a.dueDate) {
+          return -1;
+        } else if (b.dueDate) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+    }
+
     setTasks(filteredTasks);
-  }, [status, priority, board]);
+  }, [status, priority, sortOption, board]);
   if (isLoading) return 
   if (error) return <div>Error: {error}</div>;
   return <div>
@@ -45,7 +70,8 @@ function ListView() {
         <SelectItem value="done">Done</SelectItem>
       </SelectContent>
     </Select>
-    <Select onValueChange={(value)=>setPriority(value)} >
+    <Select onValueChange={(value)=>
+      setPriority(value)} >
       <SelectTrigger className="w-[140px]">
         <SelectValue placeholder="Filter by Priority" />
       </SelectTrigger>
@@ -55,8 +81,18 @@ function ListView() {
         <SelectItem value="high">High</SelectItem>
       </SelectContent>
     </Select>
+    <Select onValueChange={(value)=>setSortOption(value)} > {/* New Select for sorting */}
+      <SelectTrigger className="w-[140px]">
+        <SelectValue placeholder="Sort by" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="priority_high_to_low">Priority (High to Low)</SelectItem>
+        <SelectItem value="priority_low_to_high">Priority (Low to High)</SelectItem>
+        <SelectItem value="dueDate">Due Date</SelectItem>
+      </SelectContent>
+    </Select>
     <Button variant="secondary" onClick={()=>{setStatus("all");setPriority("all")}}>
-      Reset
+      Reset <RefreshCcw className="ml-1 w-3 h-3" />
     </Button>
     </div>
     <Table>
@@ -86,7 +122,7 @@ function ListView() {
                 <TableCell>
                   <Badge className={`${getPriorityColor(task.priority)} text-white capitalize`}>{task.priority}</Badge>
                 </TableCell>
-                <TableCell >{task.dueDate ? task.dueDate : "-"}</TableCell>
+                <TableCell >{task.dueDate ? formatDate(task.dueDate) : "-"}</TableCell>
                 <TableCell>
                 <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -104,7 +140,13 @@ function ListView() {
                                     >Edit</DropdownMenuItem>
                                     <DropdownMenuItem>Duplicate</DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem>Delete</DropdownMenuItem>
+                                    <DropdownMenuItem
+                                    onClick={()=>{
+                                      deleteTask(task.id)
+                                      refreshBoard()
+
+                                    }}
+                                    >Delete</DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                 
@@ -126,3 +168,14 @@ function ListView() {
 }
 
 export default ListView;
+
+
+ type TaskResType = {
+  id: string;
+  title: string;
+  description: string;
+  priority: string;
+  dueDate: string | null;
+  status: TaskStatus;
+  createdAt:any
+}

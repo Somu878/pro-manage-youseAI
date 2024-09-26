@@ -3,13 +3,13 @@ import Task from "./Task";
 import {  TaskStatus, Task as TaskType } from "@/lib/types";
 import { Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { DndContext } from "@/components/context/DndContext";
-
 import { useBoard } from "@/app/hooks/UseBoard";
-import { Loader } from "lucide-react";
+import BoardLoader from "@/components/ui/BoardLoader";
+import { Loader2 } from "lucide-react";
 
 
 function BoardView() {
-  const{board,updateBoard,isLoading,error}=useBoard()
+  const{board,updateBoard,isLoading,error,refreshBoard}=useBoard()
   const [tasks, setTasks] = useState<Record<TaskStatus, TaskType[]>>({
     todo: [],
     in_progress: [],
@@ -47,20 +47,16 @@ function BoardView() {
       // Moving task between columns
       const sourceColumn = source.droppableId as keyof typeof tasks;
       const destinationColumn = destination.droppableId as keyof typeof tasks;
-
       const sourceTasks = Array.from(tasks[sourceColumn]);
       const destTasks = Array.from(tasks[destinationColumn]);
-
       // Remove the task from the source column
       const [movedTask]= sourceTasks.splice(source.index, 1) as TaskType[]
       console.log(movedTask)
-
       // Add the task to the destination column
       destTasks.splice(destination.index, 0, movedTask);
       console.log(destTasks)
       //update the task's status when moving between columns
       movedTask.status = destinationColumn as TaskStatus;
-
       // Update the state with tasks in both columns
       setTasks((prev) => ({
         ...prev,
@@ -75,8 +71,11 @@ function BoardView() {
     updateBoard(all)
     }
   };
+if(tasks.todo.length===0 && tasks.in_progress.length===0 && tasks.done.length===0) return <div className="text-center text-gray-500 flex items-center justify-center h-[550px]" >No tasks found <br /> Add some tasks to get started</div>
+if(isLoading) return <div className="text-center text-gray-500 flex items-center justify-center h-[550px]" >
+ <Loader2 className='w-7   h-7 animate-spin' />
+</div>
 
-if (isLoading) return <Loader />;
 if (error) return <div>Error: {error}</div>;
   return (
     <DndContext onDragEnd={onDragEnd}>
@@ -88,7 +87,8 @@ if (error) return <div>Error: {error}</div>;
                 <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="bg-gray-100 rounded-lg shadow-md p-4"
+                className="bg-gray-100 rounded-lg shadow-md p-4 min-h-[550px]
+                dark:bg-gray-900 dark:text-white"
               >
                   <h2 className="text-lg font-bold mb-2">
                     {columnTitles[column as keyof typeof columnTitles]}
@@ -103,11 +103,12 @@ if (error) return <div>Error: {error}</div>;
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className=" cursor-grab"
+                            className="cursor-grab 
+                            rounded-md
+                            active:shadow-lg active:shadow-gray-400"
                           >
-                         <Task task={task} />
+                         <Task task={task} refreshBoard={()=>refreshBoard()} />
                           </div>
-                          
                         )}
                       </Draggable>
                     ))}

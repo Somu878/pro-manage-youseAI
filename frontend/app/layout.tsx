@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { ThemeProvider } from "@/components/context/themeContext";
 // import Sidebar from "@/components/core/Sidebar";
 
 const geistSans = localFont({
@@ -29,10 +30,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem
+        >
         {/* Disabling for now since it is not stated in the problem statement */}
         {/* <Sidebar />  */}
 
         {children}
+        </ThemeProvider>
       </body>
     </html>
   );

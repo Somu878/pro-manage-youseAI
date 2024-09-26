@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import _ from 'lodash';
 import { Task as TaskType } from '@/lib/types';
 import { getBoard, updateBoardTasks } from '@/app/api/boardApi';
@@ -8,6 +8,7 @@ interface BoardContextType {
   updateBoard: (newBoard: TaskType[]) => void;
   isLoading: boolean;
   error: string | null;
+ refreshBoard: () => void;
 }
 
 export const BoardContext = createContext<BoardContextType | undefined>(undefined);
@@ -21,7 +22,6 @@ export function BoardProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
     try {
-  
       const data = await getBoard();
       setBoard(data);
     } catch (err) {
@@ -30,10 +30,14 @@ export function BoardProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   };
+  const refreshBoard = () => {
+    fetchBoard()
+  }
 
   useEffect(() => {
     fetchBoard();
   }, []);
+
 
 
   const updateBoard = (newBoard: TaskType[]) => {
@@ -42,8 +46,9 @@ export function BoardProvider({ children }: { children: ReactNode }) {
     debouncedUpdate();
   };
 
+
   return (
-    <BoardContext.Provider value={{ board, updateBoard, isLoading, error }}>
+    <BoardContext.Provider value={{ board, updateBoard, isLoading, error,refreshBoard}}>
       {children}
     </BoardContext.Provider>
   );

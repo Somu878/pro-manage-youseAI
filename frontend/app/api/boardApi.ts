@@ -23,7 +23,8 @@ export const updateBoardTasks = async (newBoard: TaskType[]): Promise<void> => {
 
 export const addTask = async (task: TaskType): Promise<void> => {
     const response = await axiosInstance.post("/tasks",task);
-    if(response.status === 200){
+    console.log(response)
+    if(response.status === 201){
         return response.data
     }
     else{
@@ -38,5 +39,15 @@ export const updateTask = async (task: TaskType): Promise<void> => {
     }
     else{
         throw new Error('Failed to update task');
+    }
+};
+
+export const deleteTask = async (taskId: string): Promise<void> => {
+    const response = await axiosInstance.delete(`/tasks/${taskId}`);
+    if(response.status === 200){
+        return response.data
+    }
+    else{
+        throw new Error('Failed to delete task');
     }
 };

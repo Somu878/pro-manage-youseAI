@@ -9,9 +9,9 @@ import ListView from "@/components/core/board/list-view";
 import { useState } from "react";
 import { TaskDialog } from "@/components/core/task-dialog";
 import { BoardProvider } from "@/components/context/BoardContext";
+import { PlusIcon } from "lucide-react";
 export default function Page() {
   const { user } = useAuth();
-
 const [isDialogOpen, setIsDialogOpen] = useState(false)
   return (
     <div>
@@ -20,18 +20,17 @@ const [isDialogOpen, setIsDialogOpen] = useState(false)
       <div className="flex-grow mx-auto container p-4 ">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-md font-bold md:text-2xl">Task Management Dashboard</h1>
-          <Button onClick={()=>setIsDialogOpen(true)}>Add Task</Button>
+          <Button onClick={()=>setIsDialogOpen(true)}> Add Task<PlusIcon className="w-4 h-4 mr-2" /></Button>
         </div>
         <div>
           <Tabs defaultValue="board">
             <TabsList>
-              <TabsTrigger value="board">Board</TabsTrigger>
-              <TabsTrigger value="list">List</TabsTrigger>
+              <TabsTrigger value="board">Board View</TabsTrigger>
+              <TabsTrigger value="list">List View</TabsTrigger>
             </TabsList>
             <TabsContent value="board">
             {/* Board view */}
               <BoardView />
-             
             </TabsContent>
             <TabsContent value="list">
               {/* <List view /> */}

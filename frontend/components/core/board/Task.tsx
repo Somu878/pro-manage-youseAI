@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { TaskDialog } from "@/components/core/task-dialog"
 import { useState } from "react"
 import { formatDate } from "@/lib/helpers"
+import { deleteTask } from "@/app/api/boardApi"
+
 
 export const getPriorityColor = (priority: string) => {
   switch (priority.toLowerCase()) {
@@ -20,8 +22,13 @@ export const getPriorityColor = (priority: string) => {
       return 'bg-gray-500 hover:bg-gray-600'
   }
 }
-export default function Task({task}: {task: TaskType}) {
+
+export default function Task({task,refreshBoard}: {task: TaskType,refreshBoard:()=>void}) {
 const [isDialogOpen, setIsDialogOpen] = useState(false)
+const handleDelete = async () => {
+  await deleteTask(task.id); 
+  refreshBoard()
+};
     return (
         <Card>
             <CardHeader>
@@ -36,9 +43,12 @@ const [isDialogOpen, setIsDialogOpen] = useState(false)
                                   <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                     <DropdownMenuItem onClick={()=>setIsDialogOpen(true)}>Edit</DropdownMenuItem>
-                                    <DropdownMenuItem>Duplicate</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={()=>
+                                      setIsDialogOpen(true)
+            
+                                    }>Duplicate</DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem>Delete</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                 </div>
@@ -52,7 +62,11 @@ const [isDialogOpen, setIsDialogOpen] = useState(false)
                            {task.dueDate && <span className="text-xs text-gray-500"> {formatDate(task.dueDate)}</span>}
                               </div>
                             </CardFooter>
-                            <TaskDialog task={task} isOpen={isDialogOpen} onClose={()=>setIsDialogOpen(false)} onSave={()=>setIsDialogOpen(false)} />
+                            <TaskDialog task={task} isOpen={isDialogOpen} onClose={()=>setIsDialogOpen(false)} onSave={()=>
+                              {
+                                refreshBoard()
+                                setIsDialogOpen(false)}
+                            } />
         </Card>
      
     )

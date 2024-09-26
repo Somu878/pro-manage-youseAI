@@ -11,6 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Loader2 } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 interface NavbarProps {
   userName: User
@@ -27,13 +29,15 @@ export default function Navbar({ userName }: NavbarProps) {
     deleteCookie("token")
     router.push("/on-board")
   }
+ 
   return (
-    <nav className="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700">
+    <nav className="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-900 dark:border-gray-700">
       <div className="flex flex-wrap justify-between items-center">
         <div className="flex items-center">
           <span className="self-center text-m font-semibold whitespace-nowrap md:xl dark:text-white">Pro Manage</span>
         </div>
         <div className="flex items-center">
+        <div className="mr-4">  <ThemeToggle /></div>
           <span className="hidden md:block mr-4 text-sm font-medium text-gray-900 dark:text-white">Welcome, {userName?.name as unknown as string}</span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

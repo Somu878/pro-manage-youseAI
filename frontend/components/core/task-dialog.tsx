@@ -14,6 +14,7 @@ import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Task, TaskStatus } from "@/lib/types"
 import { addTask, updateTask } from "@/app/api/boardApi"
+import { useBoard } from "@/app/hooks/UseBoard"
 
 
 interface TaskDialogProps {
@@ -23,13 +24,27 @@ interface TaskDialogProps {
   task?: Task | null
 }
 
-export function TaskDialog({ isOpen, onClose,  task }: TaskDialogProps) {
+export function TaskDialog({ isOpen, onClose, onSave, task }: TaskDialogProps) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [status, setStatus] = useState<Task['status']>()
   const [priority, setPriority] = useState<Task['priority']>("medium")
   const [dueDate, setDueDate] = useState<Date | null>(null)
+  const {refreshBoard}=useBoard()
 const [action,setAction]=useState<"add" | "edit">("add")
+useEffect(()=>{
+if(!task){
+  resetForm()
+}
+},[isOpen,task])
+function resetForm(){
+  setTitle("")
+  setDescription("")
+  setStatus(undefined)
+  setPriority("")
+  setDueDate(null)
+  setAction("add")
+}
   useEffect(() => {
     if (task) {
       setTitle(task.title)
@@ -39,12 +54,7 @@ const [action,setAction]=useState<"add" | "edit">("add")
       setDueDate(new Date(task.dueDate as string))
       setAction("edit")
     } else {
-      setTitle("")
-      setDescription("")
-      setStatus("todo" as TaskStatus)
-      setPriority("")
-      setDueDate(null)
-      setAction("add")
+resetForm()
     }
   }, [task])
 
@@ -59,7 +69,10 @@ if (action==="add"){
     dueDate:dueDate?.toISOString() as string | null,
   }
   await addTask(newTask)
+  refreshBoard()
   onClose()
+  onSave(newTask)
+  resetForm()
 }
 else{
   const updatedTask = {
@@ -72,12 +85,15 @@ else{
   }
   await updateTask(updatedTask as Task)
   onClose()
+  onSave(updatedTask as Task)
+  resetForm()
+  refreshBoard()
 }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[450px]">
+      <DialogContent className="max-w-[350px] rounded-lg md:max-w-[450px]">
         <DialogHeader>
           <DialogTitle>{task ? "Edit Task" : "Add New Task"}</DialogTitle>
           <DialogDescription>
